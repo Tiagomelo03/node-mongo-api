@@ -1,0 +1,80 @@
+/**
+ * @file styles.css
+ * @description This file contains the CSS styles for the web application.
+ * @version 1.0.0
+ * @date 2024-11-20
+ * @author Pedro Moreira
+ * @organization ESTG-IPVC
+ */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+  h2 {
+    color: #333;
+    font-size: 1.5em;
+    margin: 20px 0;
+  }
+  table {
+    width: 80%;
+    max-width: 800px;
+    margin-top: 20px;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  th {
+    background-color: #0073e6;
+    color: #fff;
+  }
+  td[contenteditable="true"] {
+    background-color: #f9f9ff;
+    outline: none;
+    cursor: text;
+  }
+  tr:hover td[contenteditable="true"] {
+    background-color: #e3f2fd;
+  }
+  button {
+    padding: 6px 10px;
+    margin: 4px;
+    font-size: 0.9em;
+    color: #fff;
+    background-color: #0073e6;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #005bb5;
+  }
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  .new-item-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .new-item-form input {
+    padding: 8px;
+    font-size: 0.9em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .new-item-form button {
+    padding: 8px 16px;
+    font-size: 1em;
+  }
+  
