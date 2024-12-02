@@ -49,42 +49,70 @@ await startServer();
 
 // CRUD endpoints
 
-// Get all students
-app.get('/students', async (req, res) => {
-    try {
-        // console.log(req.collection);
-        const students = await req.collection.find().toArray();
-        res.json(students);
-    } catch (err) {
-        res.status(500).send({ error: 'Failed to fetch students', details: err.message });
-    }
-});
 
 // Get a student by ID
 app.get('/students/:id', async (req, res) => {
     try {
-        const student = await req.collection.findOne({ _id: new ObjectId(req.params.id) });
-        if (student) {
-            res.json(student);
-        } else {
-            res.status(404).send({ error: 'Student not found' });
+        const id = req.params.id;
+        const student = await db.collection('students').findOne({ _id: new ObjectId(id) });
+        if (!student) {
+            return res.status(404).send({ error: 'Student not found' });
         }
+        res.json(student);
     } catch (err) {
         res.status(500).send({ error: 'Failed to fetch student', details: err.message });
     }
 });
 
-// Create a new student
-// =================================================================
-// route to create a new student
-// =================================================================
+// Get all students
+app.get('/students', async (req, res) => {
+    try {
+        const students = await db.collection('students').find().toArray();
+        res.json(students);
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to fetch students' });
+    }
+});
+
+// Add a new student
+app.post('/students', async (req, res) => {
+    try {
+        const student = req.body;
+        const result = await db.collection('students').insertOne(student);
+        res.status(201).json({ _id: result.insertedId, ...student });
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to add student' });
+    }
+});
 
 // Update a student by ID
-// =================================================================
-// route to update a student
-// =================================================================
+app.put('/students/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const updates = req.body;
+        const result = await db.collection('students').updateOne(
+            { _id: new ObjectId(id) },
+            { $set: updates }
+        );
+        if (result.matchedCount === 0) {
+            return res.status(404).send({ error: 'Student not found' });
+        }
+        res.send({ message: 'Student updated successfully' });
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to update student' });
+    }
+});
 
 // Delete a student by ID
-// =================================================================
-// route to delete a given student
-// =================================================================
+app.delete('/students/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await db.collection('students').deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount === 0) {
+            return res.status(404).send({ error: 'Student not found' });
+        }
+        res.send({ message: 'Student deleted successfully' });
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to delete student' });
+    }
+});

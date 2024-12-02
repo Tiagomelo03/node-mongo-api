@@ -16,59 +16,86 @@ app.use(express.json());
 app.use(express.static('public')); // Serve static files from the 'public' directory
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/studentsdb');
+mongoose.connect('mongodb://localhost:27017/studentsdb', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 
 // Define the Student schema
 const studentSchema = new mongoose.Schema({
     name: { type: String, required: true },
     age: { type: Number, required: true },
-    study: { type: String, required: true }
+    study: { type: String, required: true },
 });
 
 // Create the Student model
 const Student = mongoose.model('Student', studentSchema);
 
-
 // CRUD endpoints
-// Get all students
+
+/// Get all students
 app.get('/students', async (req, res) => {
     try {
         const students = await Student.find();
         res.json(students);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: 'Failed to fetch students' });
     }
 });
-
 // Get a student by ID
 app.get('/students/:id', async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
-        if (student) {
-            res.json(student);
-        } else {
-            res.status(404).send('Student not found');
+        const id = req.params.id;
+        const student = await Student.findById(id);
+        if (!student) {
+            return res.status(404).send({ error: 'Student not found' });
         }
+        res.json(student);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ error: 'Failed to fetch student', details: err.message });
     }
 });
 
-// Create a new student
-//================================================================
-// route to create a new student
-//================================================================
+// Add a new student
+app.post('/students', async (req, res) => {
+    try {
+        const student = new Student(req.body);
+        const savedStudent = await student.save();
+        res.status(201).json(savedStudent);
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to add student' });
+    }
+});
 
 // Update a student by ID
-//================================================================
-// route to update(save) a  student
-//================================================================
-
+app.put('/students/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const updates = req.body;
+        const updatedStudent = await Student.findByIdAndUpdate(id, updates, { new: true });
+        if (!updatedStudent) {
+            return res.status(404).send({ error: 'Student not found' });
+        }
+        res.send(updatedStudent);
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to update student' });
+    }
+});
 
 // Delete a student by ID
-//================================================================
-// route to delete a student
-//================================================================
+app.delete('/students/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedStudent = await Student.findByIdAndDelete(id);
+        if (!deletedStudent) {
+            return res.status(404).send({ error: 'Student not found' });
+        }
+        res.send({ message: 'Student deleted successfully' });
+    } catch (err) {
+        res.status(500).send({ error: 'Failed to delete student' });
+    }
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;
